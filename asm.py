@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 import types,dis,sys
 
+# A minimal two-pass assembler for CPythin VM bytecode.  It can handle assembly
+# instructions (simple and extended BINARY_OPs), constants, variables and
+# labels.  Assembly source file is read from stdin until EOF. Resulting
+# function is compiled and executed immediately after.
+
 # Some CPython VM opcodes, feel free to extend these
 OPS = {'LOAD_CONST':100,'LOAD_FAST':124,'STORE_FAST':125,'RETURN_VALUE':83,'JUMP_FORWARD':110,'JUMP_BACKWARD':140,'POP_JUMP_IF_FALSE':114,'POP_JUMP_IF_TRUE':115,'BINARY_OP':122}
 
