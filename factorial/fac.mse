@@ -1,0 +1,17 @@
+' A simple factorial program in MOUSE language
+
+N 10 =
+
+I 2 =
+F 1 =
+(
+  N. 1 + I. - ^
+  F F. I. * =
+  I I. 1 + =
+)
+N.! " => " F.! "!"
+
+' Or implemented as a recursive macro (from BYTE 1979-07)
+"10 => " #F,10;! "!"
+$F F%A=1(F.^F.*FF.1-=) @
+

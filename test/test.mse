@@ -1,0 +1,69 @@
+' This is a comment and should be ignored
+"!TEST SCRIPT FOR MOUSE LANGUAGE!!"
+
+' Exclamation point is a line wrap in strings
+"THIS SHOULD APPEAR"   " "
+"AS ONE LINE!"
+"THIS SHOULD BE!IN TWO LINES!"
+
+' Conditionals
+0           [ "FAIL IF!" ]
+1           [ "IF/ELSE WORKS, RUNNING TESTS...!" ]
+5 [
+  0 [ "FAIL NESTED IF!" ]
+	1 [
+	  0 [ "FAILED NESTED IF-2!" ]
+	]
+]
+
+' Arithmetics
+0           [ "FAIL 0!" ]
+2 2 -       [ "FAIL 2=2!" ]
+2 2 + 4 -   [ "FAIL 2+2=4!" ]
+2 3 * 6 -   [ "FAIL 2*3=6!" ]
+2 3 * 6 -   [ "FAIL 2*3=6!" ]
+12 3 / 4 -  [ "FAIL 12/3=4!" ]
+
+' Variables (A=0, B=1, ..., Z=25)
+A           [ "FAIL A!" A! ]
+B 1  -      [ "FAIL B!" B! ]
+C 2  -      [ "FAIL C!" C! ]
+Z 25 -      [ "FAIL Z!" Z! ]
+
+A 10 =
+A. 10 -     [ "FAIL A=10!" ]
+B.          [ "FAIL B=0!" ]
+B 3 =
+A.B.-7-     [ "FAIL A-B=7!" ]
+A.B.*50-    [ "FAIL A*B=50!" ]
+
+' Loops
+A 0 = (A. ^ A 1 =) A. [ "FAIL FIRST LOOP CONDITION!" ]
+A 5 = (A. ^ AA.1-= ) A. [ "FAIL LOOP-1!" ]
+A 5 = B 0 = (A. ^ AA.1-= BB.5+= ) B.50- [ "FAIL LOOP-2!" ]
+
+' Macros
+#Z;         ' Unknown macro, should not crash
+#A; 42 -    [ "FAIL MACRO A!" ]
+
+#B,5,3; 5-  [ "FAIL MACRO B-1!" ]
+#B,5,5; 5-  [ "FAIL MACRO B-2!" ]
+#B,3,5; 5-  [ "FAIL MACRO B-3!" ]
+
+#F,6; 3628800 - [ "FAIL MACRO F!" ]
+#F,10; 3628800 - [ "FAIL MACRO F!" ]
+
+"!DONE.!"
+$
+
+
+
+' These are macros, must be defined at the end of the program
+$A 42 @             ' A: simply, return 42
+$E 1%A%B<%A%B>+-  @ ' E: Are numbers equal?
+
+$B %A %B > [ %A ]   ' B: return bigger of 2 values (nested macro E)
+   %A %B < [ %B ]
+   #E,%A,%B; [ %A ] @
+
+$F %A [%A #F,%A1-;*] 1%A-[1] @ ' F: Factorial macro from BYTE 1979-07
