@@ -61,10 +61,7 @@ def mouse(s):
         elif s[i] == ")": _, i, offset = rs[-1]
         # Call a macro: save current code pointer and variable offset, jump to the start of the macro
         elif s[i] == "#":
-            if s[i + 1] in defs:
-                rs.append(("MACRO", i, offset))
-                i = defs[s[i + 1]]
-                offset = offset + 26
+            if s[i + 1] in defs: rs.append(("MACRO", i, offset)); i = defs[s[i + 1]]; offset = offset + 26
             else: i += skip(s[i + 1 :], "#", ";")
         # End of macro: return to the macro call address and ignore until the last parameter (";")
         elif s[i] == "@": _, i, offset = rs.pop(); i += skip(s[i + 1 :], "#", ";")
@@ -74,8 +71,7 @@ def mouse(s):
         elif s[i] == "%":
             pn = ord(s[i + 1])-ord("A")+1
             rs.append(("PARAM", i + 1, offset))
-            pb = 1
-            tmp = len(rs) - 1
+            pb, tmp = 1, len(rs) - 1
             while pb:
                 tmp = tmp - 1
                 tag, nn, off = rs[tmp]
