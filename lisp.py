@@ -51,7 +51,7 @@ def atom(x): return "t" if type(x) != type([]) or len(x) == 0 else []
 #        eq[car[fn];LAMBDA] → eval[caddr[fn]; pairlis[cadr[fn];x;a]]];
 #
 def apply(f, args, L):
-    if f == "atom": return "t" if atom(args[0]) else []
+    if f == "atom": return atom(args[0])
     elif f == "car": return args[0][0]
     elif f == "cdr": return args[0][1:]
     elif f == "cons": return [args[0]] + args[1]
