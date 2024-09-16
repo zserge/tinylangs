@@ -4,6 +4,7 @@
 ![BASIC](https://img.shields.io/badge/BASIC-53_LOC-green)
 ![MOUSE](https://img.shields.io/badge/MOUSE-55_LOC-yellow)
 ![LISP](https://img.shields.io/badge/LISP-39_LOC-green)
+![TCL](https://img.shields.io/badge/TCL-48_LOC-green)
 ![APL/K](https://img.shields.io/badge/APL/K-45_LOC-green)
 ![PL/0](https://img.shields.io/badge/PL/0-74_LOC-yellow)
 
