@@ -11,8 +11,7 @@ def num(s):
 def expr(s):
     res, s = term(s); op = ""
     while s and s[0] in "+-":
-        op = s[0]
-        n, s = term(s[1:])
+        op = s[0]; n, s = term(s[1:])
         res += n if op == "+" else -n
     return res, s
 
@@ -20,8 +19,7 @@ def expr(s):
 def term(s):
     res, s = factor(s)
     while s and s[0] in "*/":
-        op = s[0]
-        n, s = factor(s[1:])
+        op = s[0]; n, s = factor(s[1:])
         res *= n if op == "*" else 1 / n if n != 0 else 0
     return res, s
 
@@ -45,7 +43,6 @@ def stmt(s):
         vars["#"] += 1 if vars["#"] else 0
         ops = {
             "rem": lambda args: None,
-            "new": lambda args: code.clear(),
             "bye": lambda args: sys.exit(0),
             "list": lambda args: print("\n".join([f"{n:3} {ln}" for (n, ln) in sorted(code.items()) if ln])),
             "print": lambda args: print(args[1:-1] if args and args[0] == '"' else expr(args)[0]),

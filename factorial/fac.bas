@@ -2,8 +2,6 @@ REM
 REM Factorial program
 REM
 
-new
-
 10  print "Enter N:"
 20  input n
 30  f=1
