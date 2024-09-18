@@ -2,7 +2,7 @@
 
 ![ASM](https://img.shields.io/badge/ASM-38_LOC-green)
 ![BASIC](https://img.shields.io/badge/BASIC-50_LOC-green)
-![MOUSE](https://img.shields.io/badge/MOUSE-55_LOC-yellow)
+![MOUSE](https://img.shields.io/badge/MOUSE-50_LOC-green)
 ![LISP](https://img.shields.io/badge/LISP-39_LOC-green)
 ![TCL](https://img.shields.io/badge/TCL-48_LOC-green)
 ![APL/K](https://img.shields.io/badge/APL/K-45_LOC-green)
