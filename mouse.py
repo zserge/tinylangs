@@ -12,14 +12,15 @@ def skip(s, l, r): return next(i + 1 for i, c in enumerate(s) if (c == r and (s[
 def mouse(s):
     # We need to store macro definitons (they don't shadow variables),
     # data stack, return stack and memory for variables.
-    defs, ds, rs, data = {}, [], [], [0] * 200
-    # First we loop over code and store starting addresses of all macros
-    for i, c in enumerate(s):
-        if c == "$": defs[s[i + 1]] = i + 2
     # "i" is a code pointer, offset if the start of the first local variable
     # "A" in current environment (environments can be nested, so inner
     # function's "A" becomes 26, the other inner starts with 52 etc.
-    i, offset = 0, 0
+    defs, ds, rs, data, i, offset = {}, [], [], [0] * 200, 0, 0
+
+    # First we loop over code and store starting addresses of all macros
+    for n, c in enumerate(s):
+        if c == "$": defs[s[n + 1]] = n + 2
+
     while i < len(s) and s[i] != "$":
         # Skip whitespace
         if s[i] in " \t\r\n]$": pass
@@ -29,8 +30,7 @@ def mouse(s):
         elif s[i].isdigit():
             n = 0
             while s[i].isdigit(): n = n * 10 + ord(s[i]) - ord("0"); i = i + 1
-            i = i - 1
-            ds.append(n)
+            i = i - 1; ds.append(n)
         # Put variable address on data stack
         elif s[i] in "ABCDEFGHIJKLMNOPQRSTUVWXYZ": ds.append(ord(s[i]) - ord("A") + offset)
         # Read user input as a number
@@ -69,12 +69,9 @@ def mouse(s):
         elif s[i] == "," or s[i] == ";": _, i, offset = rs.pop()
         # Macro parameter inside macro: jump to the matching value from the macro call
         elif s[i] == "%":
-            pn = ord(s[i + 1])-ord("A")+1
-            rs.append(("PARAM", i + 1, offset))
-            pb, tmp = 1, len(rs) - 1
+            pn = ord(s[i + 1])-ord("A")+1; rs.append(("PARAM", i + 1, offset)); pb, tmp = 1, len(rs) - 1
             while pb:
-                tmp = tmp - 1
-                tag, nn, off = rs[tmp]
+                tmp = tmp - 1; tag, nn, off = rs[tmp]
                 if tag == "MACRO": pb = pb - 1
                 elif tag == "PARAM": pb = pb + 1
             _, i, offset = rs[tmp]
