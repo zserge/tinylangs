@@ -74,11 +74,7 @@ def parse(code):
     return block()
 
 def eval(node, scope=(None, {}, {})):
-    def find(x, i=1):
-        frame = scope
-        while frame != None:
-            if x in frame[i]: return frame[i]
-            else: frame = frame[0]
+    def find(x, i=1, frame=scope): return frame[i] if x in frame[i] else find(x, i, frame[0])
 
     if type(node) is int: return node
     elif node[0] == "id": return find(node[1], 1)[node[1]]
