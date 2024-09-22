@@ -7,8 +7,9 @@ def parse(code):
     tok = ""; kind = ""; code = code + ";" # force terminate code to trick look-ahead lexer
 
     # A simple regex-based lexer for PL/0, cuts one token from the string
-    def lex(expected=None):
+    def lex(expected=None, when=None):
         nonlocal code, tok, kind
+        if when and tok != when: return
         if expected and kind != expected: raise SyntaxError(f"Expected {expected} but got {kind}")
         m = re.match(r"(?P<num>[0-9]+)|(?P<op>[-+*/()<>=])|(?P<ws>\s+)|(?P<kw>begin|end\.|end|if|then|while|do|var|!|\?|call|procedure)|(?P<id>[a-zA-Z]+)|(?P<semi>;)|(?P<asgn>:=)|(?P<comma>,)", code)
         if not m: raise SyntaxError("unexpected character")
@@ -20,9 +21,7 @@ def parse(code):
         # var <name> , ... ;
         while tok == "var":
             lex("kw")
-            while tok != ";":
-                var.append(tok); lex("id")
-                if tok == ",": lex("comma")
+            while tok != ";": var.append(tok); lex("id"); lex("comma", ",")
             lex("semi")
         # procedure <name> ; begin ... end;
         while tok=='procedure': lex('kw'); n=tok; lex('id'); lex('semi'); proc.append((n, block())); lex('semi')
@@ -41,9 +40,7 @@ def parse(code):
         # begin <stmt...> end
         elif tok == "begin":
             lex("kw"); body = []
-            while tok != "end" and tok != "end.":
-                body.append(stmt())
-                if tok == ";": lex("semi")
+            while tok != "end" and tok != "end.": body.append(stmt()); lex("semi", ";")
             lex("kw"); return "begin", body
         # if <cond> then <stmt>
         # while <cond> do <stmt>
