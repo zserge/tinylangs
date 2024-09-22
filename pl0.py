@@ -3,67 +3,63 @@
 import re, sys, operator
 
 
-# A simple regex-based lexer for PL/0, cuts one token from the string
-def lex(s):
-    m = re.match(r"(?P<num>[0-9]+)|(?P<op>[-+*/()<>=])|(?P<ws>\s+)|(?P<kw>begin|end\.|end|if|then|while|do|var|!|\?|call|procedure)|(?P<id>[a-zA-Z]+)|(?P<semi>;)|(?P<asgn>:=)|(?P<comma>,)", s)
-    if not m: raise SyntaxError("unexpected character")
-    if m.lastgroup == "ws": return lex(s[m.end():])
-    return s[:m.end()], m.lastgroup, s[m.end():]
-
-
 def parse(code):
-    tok, kind, code = lex(code + ";") # force terminate code to trick look-ahead lexer
+    tok = ""; kind = ""; code = code + ";" # force terminate code to trick look-ahead lexer
 
-    def eat(expected):
+    # A simple regex-based lexer for PL/0, cuts one token from the string
+    def lex(expected=None):
         nonlocal code, tok, kind
-        if kind != expected: raise SyntaxError(f"Expected {expected} but got {kind}")
-        prevtok=tok; tok,kind,code=lex(code); return prevtok
+        if expected and kind != expected: raise SyntaxError(f"Expected {expected} but got {kind}")
+        m = re.match(r"(?P<num>[0-9]+)|(?P<op>[-+*/()<>=])|(?P<ws>\s+)|(?P<kw>begin|end\.|end|if|then|while|do|var|!|\?|call|procedure)|(?P<id>[a-zA-Z]+)|(?P<semi>;)|(?P<asgn>:=)|(?P<comma>,)", code)
+        if not m: raise SyntaxError("unexpected character")
+        if m.lastgroup == "ws": code = code[m.end():]; return lex()
+        tok = code[:m.end()]; kind = m.lastgroup; code = code[m.end():]
 
     def block():
         var, proc = [], []
         # var <name> , ... ;
         while tok == "var":
-            eat("kw")
+            lex("kw")
             while tok != ";":
-                var.append(eat("id"))
-                if tok == ",": eat("comma")
-            eat("semi")
+                var.append(tok); lex("id")
+                if tok == ",": lex("comma")
+            lex("semi")
         # procedure <name> ; begin ... end;
-        while tok=='procedure': eat('kw'); n=eat('id'); eat('semi'); proc.append((n, block())); eat('semi')
+        while tok=='procedure': lex('kw'); n=tok; lex('id'); lex('semi'); proc.append((n, block())); lex('semi')
         # begin ... end (statement)
         return 'block',var,proc,stmt()
 
     def stmt():
         # <id> := <expr>
-        if kind == "id": n = eat("id"); eat("asgn"); return "asgn", n, expr()
+        if kind == "id": n = tok; lex("id"); lex("asgn"); return "asgn", n, expr()
         # call <id>
-        elif tok == "call": eat("kw"); n = eat("id"); return "call", n
+        elif tok == "call": lex("kw"); n = tok; lex("id"); return "call", n
         # ? <id>
-        elif tok == "?": eat("kw"); n = eat("id"); return "read", n
+        elif tok == "?": lex("kw"); n = tok; lex("id"); return "read", n
         # ! <expr>
-        elif tok == "!": eat("kw"); return "write", expr()
+        elif tok == "!": lex("kw"); return "write", expr()
         # begin <stmt...> end
         elif tok == "begin":
-            eat("kw"); body = []
+            lex("kw"); body = []
             while tok != "end" and tok != "end.":
                 body.append(stmt())
-                if tok == ";": eat("semi")
-            eat("kw"); return "begin", body
+                if tok == ";": lex("semi")
+            lex("kw"); return "begin", body
         # if <cond> then <stmt>
         # while <cond> do <stmt>
-        elif tok == "if" or tok == "while": cond = tok; eat("kw"); e = expr(); op = eat("op"); c = ("op", op, e, expr()); eat("kw"); return (cond, c, stmt())
+        elif tok == "if" or tok == "while": cond = tok; lex("kw"); e = expr(); op = tok; lex("op"); c = ("op", op, e, expr()); lex("kw"); return (cond, c, stmt())
 
     def expr(tokens="+-", term=lambda: expr("*/", factor)):
         e = term()
-        while tok in tokens: op = eat("op"); e = ("op", op, e, term())
+        while tok in tokens: op = tok; lex("op"); e = ("op", op, e, term())
         return e
 
     def factor():
-        if kind == "id": n = eat("id"); return ("id", n)
-        elif kind == "num": num = eat("num"); return int(num)
-        elif tok == "(": eat("op"); e = expr(); eat("op"); return e
+        if kind == "id": n = tok; lex("id"); return ("id", n)
+        elif kind == "num": num = tok; lex("num"); return int(num)
+        elif tok == "(": lex("op"); e = expr(); lex("op"); return e
 
-    return block()
+    lex(); return block()
 
 def eval(node, scope=(None, {}, {})):
     def find(x, i=1, frame=scope): return frame[i] if x in frame[i] else find(x, i, frame[0])
