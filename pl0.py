@@ -85,8 +85,7 @@ def eval(node, scope=(None, {}, {})):
     elif node[0] == "asgn": env = find(node[1], 1); env[node[1]] = eval(node[2], scope)
     elif node[0] == "begin": [eval(n, scope) for n in node[1]]
     elif node[0] == "read": env = find(node[1], 1); env[node[1]] = int(input("> "))
-    elif node[0] == "op":
-        return {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.floordiv, "<": operator.lt, ">": operator.gt, "=": operator.eq}[node[1]](eval(node[2], scope), eval(node[3], scope))
+    elif node[0] == "op": return {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.floordiv, "<": operator.lt, ">": operator.gt, "=": operator.eq}[node[1]](eval(node[2], scope), eval(node[3], scope))
     elif node[0] == "if":
         if eval(node[1], scope): eval(node[2], scope)
     elif node[0] == "while":
