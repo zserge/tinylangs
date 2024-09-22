@@ -92,11 +92,7 @@ def eval(node, scope=(None, {}, {})):
     elif node[0] == "while":
         while eval(node[1], scope): eval(node[2], scope)
     elif node[0] == "write": print(eval(node[1], scope))
-    elif node[0] == "block":
-        env = (scope, {}, {})
-        for v in node[1]: env[1][v] = 0
-        for p in node[2]: env[2][p[0]] = p[1]
-        eval(node[3], env)
+    elif node[0] == "block": eval(node[3], (scope, {v: 0 for v in node[1]}, {p[0]: p[1] for p in node[2]}))
     elif node[0] == "call": eval(find(node[1], 2)[node[1]], scope)
     return 0
 
