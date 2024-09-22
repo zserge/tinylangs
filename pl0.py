@@ -9,22 +9,20 @@ def parse(code):
     # A simple regex-based lexer for PL/0, cuts one token from the string
     def lex(expected=None, when=None):
         nonlocal code, tok, kind
-        if when and tok != when: return
+        if when and tok != when: return False
         if expected and kind != expected: raise SyntaxError(f"Expected {expected} but got {kind}")
         m = re.match(r"(?P<num>[0-9]+)|(?P<op>[-+*/()<>=])|(?P<ws>\s+)|(?P<kw>begin|end\.|end|if|then|while|do|var|!|\?|call|procedure)|(?P<id>[a-zA-Z]+)|(?P<semi>;)|(?P<asgn>:=)|(?P<comma>,)", code)
         if not m: raise SyntaxError("unexpected character")
         if m.lastgroup == "ws": code = code[m.end():]; return lex()
-        tok = code[:m.end()]; kind = m.lastgroup; code = code[m.end():]
+        tok = code[:m.end()]; kind = m.lastgroup; code = code[m.end():]; return True
 
     def block():
         var, proc = [], []
         # var <name> , ... ;
-        while tok == "var":
-            lex("kw")
-            while tok != ";": var.append(tok); lex("id"); lex("comma", ",")
-            lex("semi")
+        while lex("kw", "var"):
+            while not lex("semi", ";"): var.append(tok); lex("id"); lex("comma", ",")
         # procedure <name> ; begin ... end;
-        while tok=='procedure': lex('kw'); n=tok; lex('id'); lex('semi'); proc.append((n, block())); lex('semi')
+        while lex('kw', 'procedure'): n=tok; lex('id'); lex('semi'); proc.append((n, block())); lex('semi')
         # begin ... end (statement)
         return 'block',var,proc,stmt()
 
