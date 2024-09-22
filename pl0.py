@@ -56,15 +56,10 @@ def parse(code):
 
     def cond(): e = expr(); op = eat("op"); return ("op", op, e, expr())
 
-    def expr():
+    def expr(tokens="+-", term=lambda: expr("*/", factor)):
         e = term()
-        while tok in "+-": op = eat("op"); e = ("op", op, e, term())
+        while tok in tokens: op = eat("op"); e = ("op", op, e, term())
         return e
-
-    def term():
-        t = factor()
-        while tok in "*/": op = eat("op"); t = ("op", op, t, factor())
-        return t
 
     def factor():
         if kind == "id": n = eat("id"); return ("id", n)
