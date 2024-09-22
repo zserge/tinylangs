@@ -13,8 +13,7 @@ def parse(code):
         if expected and kind != expected: raise SyntaxError(f"Expected {expected} but got {kind}")
         m = re.match(r"(?P<num>[0-9]+)|(?P<op>[-+*/()<>=])|(?P<ws>\s+)|(?P<kw>begin|end\.|end|if|then|while|do|var|!|\?|call|procedure)|(?P<id>[a-zA-Z]+)|(?P<semi>;)|(?P<asgn>:=)|(?P<comma>,)", code)
         if not m: raise SyntaxError("unexpected character")
-        if m.lastgroup == "ws": code = code[m.end():]; return lex()
-        tok = code[:m.end()]; kind = m.lastgroup; code = code[m.end():]; return True
+        tok = code[:m.end()]; kind = m.lastgroup; code = code[m.end():]; return kind != "ws" or lex()
 
     def block():
         var, proc = [], []
