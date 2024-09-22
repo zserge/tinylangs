@@ -50,11 +50,8 @@ def parse(code):
                 if tok == ";": eat("semi")
             eat("kw"); return "begin", body
         # if <cond> then <stmt>
-        elif tok == "if": eat("kw"); c = cond(); eat("kw"); return ("if", c, stmt())
         # while <cond> do <stmt>
-        elif tok == "while": eat("kw"); c = cond(); eat("kw"); return ("while", c, stmt())
-
-    def cond(): e = expr(); op = eat("op"); return ("op", op, e, expr())
+        elif tok == "if" or tok == "while": cond = tok; eat("kw"); e = expr(); op = eat("op"); c = ("op", op, e, expr()); eat("kw"); return (cond, c, stmt())
 
     def expr(tokens="+-", term=lambda: expr("*/", factor)):
         e = term()
