@@ -6,7 +6,7 @@
 ![LISP](https://img.shields.io/badge/LISP-39_LOC-green)
 ![TCL](https://img.shields.io/badge/TCL-48_LOC-green)
 ![APL/K](https://img.shields.io/badge/APL/K-45_LOC-green)
-![PL/0](https://img.shields.io/badge/PL/0-74_LOC-yellow)
+![PL/0](https://img.shields.io/badge/PL/0-50_LOC-green)
 
 This repository contains code examples for [a](https://zserge.com/posts/langs-asm) [series](https://zserge.com/posts/langs-basic) [of](https://zserge.com/posts/langs-mouse) [blog](https://zserge.com/posts/langs-lisp) [posts](https://zserge.com/posts/langs-apl) ["Great Tiny Languages"](https://zserge.com/posts/langs-pl0/).
 
