@@ -22,7 +22,7 @@ I hope this project becomes a good starting point in implementing your own progr
 * `apl.py` - a k/simple interpreter, by Arthur Whitney, toy dialect of K (array processing programming language), which is a variant of APL itself.
 * `mouse.py` - concatenative programming language MOUSE, as published in BYTE magazine from 1979.
 * `pl0.py` - a PL/0 interpreter, by Niclaus Wirth.
-* `tcl.py` - a tiny, tiny command language (TCL) interpreter.
+* `tcl.py` - a tiny, tiny command language interpreter (TCL).
 
 ## License
 
