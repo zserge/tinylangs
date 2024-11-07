@@ -59,5 +59,4 @@ def stmt(s):
 
 for line in sys.stdin:
     lineno, line = num(line)
-    if lineno: code[lineno] = line.strip()
-    else: stmt(line)
+    code[lineno] = line.strip() if lineno else stmt(line)
