@@ -50,7 +50,6 @@ def assemble(code):
 code = ''.join([line for line in sys.stdin])
 consts, v, bytecode = assemble(code)
 code_obj = types.CodeType(0,0,0,len(v),128,64,bytecode,consts,(),v,'asm','mod','',1,b'',b'')
-ff = types.FunctionType(code_obj, {})
 # Optionally, disassemble the bytecode for debugging
 # dis.dis(ff)
-print(ff())
+print(types.FunctionType(code_obj, {})())
