@@ -9,54 +9,34 @@ def num(s):
     return n, s.strip()
 
 def expr(s):
-    res, s = term(s); op = ""
-    while s and s[0] in "+-":
-        op = s[0]; n, s = term(s[1:])
-        res += n if op == "+" else -n
+    res, s = term(s)
+    while s and s[0] in "+-": res += (1 if s[0] == "+" else -1) * term(s[1:])[0]; s = term(s[1:])[1]
     return res, s
-
 
 def term(s):
     res, s = factor(s)
-    while s and s[0] in "*/":
-        op = s[0]; n, s = factor(s[1:])
-        res *= n if op == "*" else 1 / n if n != 0 else 0
+    while s and s[0] in "*/": res *= factor(s[1:])[0] if s[0] == "*" else 1 / factor(s[1:])[0]; s = factor(s[1:])[1]
     return res, s
 
-
 def factor(s):
-    if s and s[0] == "(": res, s = expr(s[1:]); return res, s[1:]
-    elif s and s[0].isdigit(): return num(s)
-    else:
-        i = 0
-        while i < len(s) and s[i].isalnum(): i += 1
-        return vars.get(s[:i], 0), s[i:]
-
+    if s and s[0] == "(": return expr(s[1:])[0], s[1:]
+    return num(s) if s[0].isdigit() else (vars.get(s.split()[0], 0), s[1:])
 
 def stmt(s):
-    def do_if(s):
-        n, ln = expr(s)
-        if n: stmt(ln)
-
-    while s != None:
-        cmd = s.split(None, 1)
-        vars["#"] += 1 if vars["#"] else 0
-        ops = {
-            "rem": lambda args: None,
-            "bye": lambda args: sys.exit(0),
-            "list": lambda args: print("\n".join([f"{n:3} {ln}" for (n, ln) in sorted(code.items()) if ln])),
-            "print": lambda args: print(args[1:-1] if args and args[0] == '"' else expr(args)[0]),
-            "input": lambda args: vars.update({args[0]: int(input("] "))}),
-            "goto": lambda args: vars.update({"#": expr(args)[0]}),
-            "if": lambda args: do_if(args),
-            "run": lambda args: vars.update({"#": 1}),
-        }
-        if cmd and cmd[0].lower() in ops: ops[cmd[0].lower()](cmd[1] if len(cmd) > 1 else "")
-        elif s: assign = s.split("=", 1); vars[assign[0]], _ = expr(assign[1])
-        if vars["#"] <= 0: break
-        vars["#"], s = next(((n, ln) for (n, ln) in sorted(code.items()) if n >= vars["#"]), (0, None))
-
+    ops = {
+        "rem": lambda _: None, "bye": lambda _: sys.exit(0),
+        "list": lambda _: print("\n".join([f"{n:3} {ln}" for n, ln in sorted(code.items())])),
+        "print": lambda args: print(args[1:-1] if args[0] == '"' else expr(args)[0]),
+        "input": lambda args: vars.update({args[0]: int(input("] "))}),
+        "goto": lambda args: vars.update({"#": expr(args)[0]}),
+        "if": lambda args: stmt(args.split("then", 1)[1]) if expr(args.split("then", 1)[0])[0] else None,
+        "run": lambda _: vars.update({"#": 1}),
+    }
+    cmd, *args = s.split(None, 1)
+    if cmd in ops: ops[cmd](args[0] if args else "")
+    elif "=" in s: var, val = s.split("="); vars[var.strip()], _ = expr(val.strip())
+    vars["#"] += 1
 
 for line in sys.stdin:
     lineno, line = num(line)
-    code[lineno] = line.strip() if lineno else stmt(line)
+    code[lineno] = line if lineno else stmt(line)
